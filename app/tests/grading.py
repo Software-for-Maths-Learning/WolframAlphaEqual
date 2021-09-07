@@ -23,6 +23,8 @@ class TestGradingFunction(unittest.TestCase):
     """
 
     # Removed tests from here, as this is dependant on the WolframAlpha API
+    def test_empty(self):
+        self.assertEqual(True, True)
 
 
 if __name__ == "__main__":
