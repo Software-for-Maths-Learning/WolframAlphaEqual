@@ -7,3 +7,6 @@
 
 # Remove python caching
 __pycache__
+
+# Secret Env variables (Wolfram Alpha token)
+dev.env
