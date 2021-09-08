@@ -90,7 +90,7 @@ def query_wolframalpha(res, ans):
         is_correct = None
 
     return {
-        "is_correct": is_correct,
+        "is_correct": is_correct == "True",
         "interp_string": interp_string,
         "raw_comp": comp_res,
         "raw_interp": interp_res,
