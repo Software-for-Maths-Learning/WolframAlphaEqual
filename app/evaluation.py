@@ -4,11 +4,11 @@ import httpx
 import asyncio
 
 
-def grading_function(body: dict) -> dict:
+def evaluation_function(response, answer, params) -> dict:
     """
     Function used to grade a student response.
     ---
-    The handler function passes only one argument to grading_function(),
+    The handler function passes only one argument to evaluation_function(),
     which is a dictionary of the structure of the API request body
     deserialised from JSON.
 
@@ -21,11 +21,11 @@ def grading_function(body: dict) -> dict:
 
     The way you wish to structure you code (all in this function, or
     split into many) is entirely up to you. All that matters are the
-    return types and that grading_function() is the main function used
+    return types and that evaluation_function() is the main function used
     to output the grading response.
     """
 
-    return query_wolframalpha(body["response"], body["answer"])
+    return query_wolframalpha(response, answer)
 
 
 def query_wolframalpha(res, ans):
@@ -51,21 +51,17 @@ def query_wolframalpha(res, ans):
         **common_params,
     }
 
-    [interp_res, comp_res] = asyncio.run(get_queries([interp_params, comp_params]))
+    [interp_res,
+     comp_res] = asyncio.run(get_queries([interp_params, comp_params]))
 
     # Deal with the interpretation query response
     if not "error" in interp_res:
         try:
-            interp_string = (
-                list(
-                    filter(
-                        lambda x: x.get("id") == "Input",
-                        interp_res.get("queryresult", {}).get("pods", []),
-                    )
-                )[0]
-                .get("subpods", [{}])[0]
-                .get("plaintext", None)
-            )
+            interp_string = (list(
+                filter(
+                    lambda x: x.get("id") == "Input",
+                    interp_res.get("queryresult", {}).get("pods", []),
+                ))[0].get("subpods", [{}])[0].get("plaintext", None))
         except:
             interp_string = "error"
     else:
@@ -74,16 +70,11 @@ def query_wolframalpha(res, ans):
     # Deal with comparison
     if not "error" in comp_res:
         try:
-            is_correct = (
-                list(
-                    filter(
-                        lambda x: x.get("id") == "Result",
-                        comp_res.get("queryresult", {}).get("pods", []),
-                    )
-                )[0]
-                .get("subpods", [{}])[0]
-                .get("plaintext", None)
-            )
+            is_correct = (list(
+                filter(
+                    lambda x: x.get("id") == "Result",
+                    comp_res.get("queryresult", {}).get("pods", []),
+                ))[0].get("subpods", [{}])[0].get("plaintext", None))
         except:
             is_correct = None
     else:
@@ -140,8 +131,8 @@ def safe_get_json(response):
     except json.decoder.JSONDecodeError as e:
         return {
             "error": {
-                "description": "An Error occured when parsing JSON from response"
-                + repr(e),
+                "description":
+                "An Error occured when parsing JSON from response" + repr(e),
             }
         }
 
